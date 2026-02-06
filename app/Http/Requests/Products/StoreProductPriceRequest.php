@@ -3,9 +3,11 @@
 namespace App\Http\Requests\Products;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\Concerns\SanitizesMoneyInputs;
 
 class StoreProductPriceRequest extends FormRequest
 {
+    use SanitizesMoneyInputs;
     /**
      * Determina si el usuario está autorizado para realizar esta solicitud.
      */
@@ -30,10 +32,6 @@ class StoreProductPriceRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
-        if ($this->has('price')) {
-            $this->merge([
-                'price' => str_replace(',', '.', $this->price),
-            ]);
-        }
+        $this->sanitizeMoney(['price']);
     }
 }

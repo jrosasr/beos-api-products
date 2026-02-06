@@ -3,9 +3,11 @@
 namespace App\Http\Requests\Products;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\Concerns\SanitizesMoneyInputs;
 
 class StoreProductRequest extends FormRequest
 {
+    use SanitizesMoneyInputs;
     /**
      * Determina si el usuario está autorizado para realizar esta solicitud.
      */
@@ -34,11 +36,6 @@ class StoreProductRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
-        // Ejemplo: Asegurar que los costos sean numéricos si vienen como strings con comas
-        if ($this->has('price')) {
-            $this->merge([
-                'price' => str_replace(',', '.', $this->price),
-            ]);
-        }
+        $this->sanitizeMoney(['price', 'tax_cost', 'manufacturing_cost']);
     }
 }

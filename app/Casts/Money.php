@@ -20,6 +20,6 @@ class Money implements CastsAttributes
      */
     public function set(Model $model, string $key, mixed $value, array $attributes): int
     {
-        return (int) round($value * 100);
+        return (int) floor(round($value * 100, 2));
     }
 }
