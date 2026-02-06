@@ -9,13 +9,17 @@ use App\Actions\Products\UpdateProductAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Products\StoreProductPriceRequest;
 use App\Http\Requests\Products\StoreProductRequest;
+use App\Http\Resources\ProductPriceResource;
+use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
 
 class ProductController extends Controller
 {
     /**
-     * Obtener lista de productos.
+     * Listado de productos
+     * 
+     * Obtiene una lista de todos los productos registrados con su divisa base.
      */
     public function index(): JsonResponse
     {
@@ -23,12 +27,14 @@ class ProductController extends Controller
 
         return response()->json([
             'success' => true,
-            'data' => $products
+            'data' => ProductResource::collection($products)
         ]);
     }
 
     /**
-     * Crear un nuevo producto.
+     * Crear producto
+     * 
+     * Registra un nuevo producto en el sistema.
      */
     public function store(StoreProductRequest $request, CreateProductAction $action): JsonResponse
     {
@@ -37,23 +43,27 @@ class ProductController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Producto creado con éxito',
-            'data' => $product->load('currency')
+            'data' => new ProductResource($product->load('currency'))
         ], 201);
     }
 
     /**
-     * Obtener un producto por ID.
+     * Detalle de producto
+     * 
+     * Obtiene la información detallada de un producto específico, incluyendo sus precios en otras divisas.
      */
     public function show(Product $product): JsonResponse
     {
         return response()->json([
             'success' => true,
-            'data' => $product->load(['currency', 'prices.currency'])
+            'data' => new ProductResource($product->load(['currency', 'prices.currency']))
         ]);
     }
 
     /**
-     * Actualizar un producto.
+     * Actualizar producto
+     * 
+     * Modifica los datos de un producto existente.
      */
     public function update(StoreProductRequest $request, Product $product, UpdateProductAction $action): JsonResponse
     {
@@ -62,12 +72,14 @@ class ProductController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Producto actualizado con éxito',
-            'data' => $product->load('currency')
+            'data' => new ProductResource($product->load('currency'))
         ]);
     }
 
     /**
-     * Eliminar un producto.
+     * Eliminar producto
+     * 
+     * Elimina permanentemente un producto del catálogo.
      */
     public function destroy(Product $product, DeleteProductAction $action): JsonResponse
     {
@@ -80,18 +92,22 @@ class ProductController extends Controller
     }
 
     /**
-     * Obtener lista de precios de un producto.
+     * Listar precios por divisa
+     * 
+     * Obtiene todos los precios registrados para un producto en diferentes divisas.
      */
     public function prices(Product $product): JsonResponse
     {
         return response()->json([
             'success' => true,
-            'data' => $product->prices()->with('currency')->get()
+            'data' => ProductPriceResource::collection($product->prices()->with('currency')->get())
         ]);
     }
 
     /**
-     * Crear un nuevo precio para un producto.
+     * Añadir precio en divisa
+     * 
+     * Registra un nuevo precio para el producto en una divisa específica.
      */
     public function storePrice(StoreProductPriceRequest $request, Product $product, CreateProductPriceAction $action): JsonResponse
     {
@@ -100,7 +116,7 @@ class ProductController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Precio registrado con éxito',
-            'data' => $price->load('currency')
+            'data' => new ProductPriceResource($price->load('currency'))
         ], 201);
     }
 }
