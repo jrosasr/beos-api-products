@@ -84,8 +84,6 @@ class ProductController extends Controller
      */
     public function prices(Product $product): JsonResponse
     {
-        $this->authorize('viewPrices', $product);
-
         return response()->json([
             'success' => true,
             'data' => $product->prices()->with('currency')->get()
@@ -97,8 +95,6 @@ class ProductController extends Controller
      */
     public function storePrice(StoreProductPriceRequest $request, Product $product, CreateProductPriceAction $action): JsonResponse
     {
-        $this->authorize('addPrice', $product);
-
         $price = $action->execute($product, $request->validated());
 
         return response()->json([
