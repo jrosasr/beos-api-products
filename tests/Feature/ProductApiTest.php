@@ -121,3 +121,59 @@ test('can add a price in a different currency to a product', function () {
         'price' => 92050,
     ]);
 });
+
+/**
+ * Tests de Robustez (Fallos)
+ */
+
+test('cannot create product with invalid data', function () {
+    $data = [
+        'name' => '', // Error: Requerido
+        'price' => -10, // Error: Mínimo 0
+        'currency_id' => 999, // Error: No existe
+    ];
+
+    $response = $this->actingAs($this->user)->postJson('/api/products', $data);
+
+    $response->assertStatus(422)
+             ->assertJsonValidationErrors(['name', 'price', 'currency_id']);
+});
+
+test('cannot access products without authentication', function () {
+    $response = $this->getJson('/api/products');
+
+    $response->assertStatus(401);
+});
+
+test('cannot create product without necessary permissions', function () {
+    $unprivilegedUser = User::factory()->create();
+    // No le asignamos rol 'user', por lo que no tiene permisos
+
+    $response = $this->actingAs($unprivilegedUser)->postJson('/api/products', [
+        'name' => 'Should fail',
+        'price' => 100,
+        'currency_id' => $this->currency->id,
+        'tax_cost' => 10,
+        'manufacturing_cost' => 50
+    ]);
+
+    $response->assertStatus(403);
+});
+
+test('returns 404 when product does not exist', function () {
+    $response = $this->actingAs($this->user)->getJson('/api/products/9999');
+
+    $response->assertStatus(404);
+});
+
+test('cannot add price with invalid currency_id', function () {
+    $product = Product::factory()->create(['currency_id' => $this->currency->id]);
+
+    $response = $this->actingAs($this->user)->postJson("/api/products/{$product->id}/prices", [
+        'currency_id' => 9999,
+        'price' => 50
+    ]);
+
+    $response->assertStatus(422)
+             ->assertJsonValidationErrors(['currency_id']);
+});
