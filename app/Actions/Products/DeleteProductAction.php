@@ -10,10 +10,12 @@ class DeleteProductAction
      * Ejecuta la eliminación de un producto.
      * 
      * @param Product $product
-     * @return bool|null
+     * @return void
      */
-    public function execute(Product $product): ?bool
+    public function execute(Product $product): void
     {
-        return $product->delete();
+        \Illuminate\Support\Facades\DB::transaction(function () use ($product) {
+            $product->delete();
+        });
     }
 }

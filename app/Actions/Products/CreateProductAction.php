@@ -14,7 +14,9 @@ class CreateProductAction
      */
     public function execute(array $data): Product
     {
-        // El cast Money se encarga de convertir el decimal a entero (x100) al guardar
-        return Product::create($data);
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($data) {
+            // El cast Money se encarga de convertir el decimal a entero (x100) al guardar
+            return Product::create($data);
+        });
     }
 }

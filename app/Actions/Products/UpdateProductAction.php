@@ -15,7 +15,9 @@ class UpdateProductAction
      */
     public function execute(Product $product, array $data): Product
     {
-        $product->update($data);
-        return $product;
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($product, $data) {
+            $product->update($data);
+            return $product;
+        });
     }
 }

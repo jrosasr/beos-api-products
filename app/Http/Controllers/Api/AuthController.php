@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Actions\Auth\LoginUserAction;
+use App\Actions\Auth\RegisterUserAction;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterRequest;
 use App\Http\Resources\UserResource;
-use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
@@ -19,25 +18,16 @@ class AuthController extends Controller
      * 
      * Crea un nuevo usuario, le asigna el rol por defecto y devuelve un token de acceso.
      */
-    public function register(RegisterRequest $request): JsonResponse
+    public function register(RegisterRequest $request, RegisterUserAction $action): JsonResponse
     {
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-        ]);
-
-        // Asignar rol por defecto
-        $user->assignRole('user');
-
-        $token = $user->createToken('API Access')->plainTextToken;
+        $result = $action->execute($request->validated());
 
         return response()->json([
             'success' => true,
             'message' => 'Usuario registrado con éxito',
             'data' => [
-                'user' => new UserResource($user),
-                'token' => $token,
+                'user' => new UserResource($result['user']),
+                'token' => $result['token'],
             ]
         ], 201);
     }
@@ -47,25 +37,16 @@ class AuthController extends Controller
      * 
      * Autentica a un usuario y devuelve un token de acceso personal de Sanctum.
      */
-    public function login(LoginRequest $request): JsonResponse
+    public function login(LoginRequest $request, LoginUserAction $action): JsonResponse
     {
-        $user = User::where('email', $request->email)->first();
-
-        if (! $user || ! Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['Las credenciales proporcionadas son incorrectas.'],
-            ]);
-        }
-
-        $device = $request->device_name ?? 'API Access';
-        $token = $user->createToken($device)->plainTextToken;
+        $result = $action->execute($request->validated());
 
         return response()->json([
             'success' => true,
             'message' => 'Login exitoso',
             'data' => [
-                'user' => new UserResource($user),
-                'token' => $token,
+                'user' => new UserResource($result['user']),
+                'token' => $result['token'],
             ]
         ]);
     }
