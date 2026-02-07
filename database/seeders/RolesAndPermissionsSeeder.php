@@ -28,14 +28,15 @@ class RolesAndPermissionsSeeder extends Seeder
             'products.storePrice',
             'auth:profile',
             'auth:logout',
+            'currencies.index',
         ];
 
         foreach ($permissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission]);
+            Permission::findOrCreate($permission); // Usa el guard por defecto (web)
         }
 
         // Crear rol 'user' y asignar permisos
-        $role = Role::firstOrCreate(['name' => 'user']);
+        $role = Role::findOrCreate('user');
         $role->syncPermissions($permissions);
     }
 }

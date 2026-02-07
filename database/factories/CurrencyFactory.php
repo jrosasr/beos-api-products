@@ -18,7 +18,7 @@ class CurrencyFactory extends Factory
     {
         return [
             'name' => $this->faker->currencyCode(),
-            'symbol' => '$',
+            'symbol' => $this->faker->randomElement(['$', '€', '£', '¥']),
             'exchange_rate' => $this->faker->randomFloat(8, 0.5, 500),
         ];
     }

@@ -13,14 +13,18 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        $user = User::firstOrCreate(
-            ['email' => 'admin@admin.com'],
-            [
-                'name' => 'Admin Test',
-                'password' => Hash::make('password'),
-            ]
-        );
+        // Usar factory para crear el usuario administrador
+        $user = User::factory()->create([
+            'name' => 'Admin Test',
+            'email' => 'admin@admin.com',
+            'password' => Hash::make('password'),
+        ]);
 
         $user->assignRole('user');
+
+        // Opcional: Crear algunos usuarios aleatorios adicionales
+        User::factory()->count(3)->create()->each(function ($u) {
+            $u->assignRole('user');
+        });
     }
 }
