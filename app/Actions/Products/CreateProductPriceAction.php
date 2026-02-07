@@ -16,6 +16,8 @@ class CreateProductPriceAction
      */
     public function execute(Product $product, array $data): ProductPrice
     {
-        return $product->prices()->create($data);
+        return \Illuminate\Support\Facades\DB::transaction(function () use ($product, $data) {
+            return $product->prices()->create($data);
+        });
     }
 }
