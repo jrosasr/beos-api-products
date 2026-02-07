@@ -163,7 +163,11 @@ test('cannot create product without necessary permissions', function () {
 test('returns 404 when product does not exist', function () {
     $response = $this->actingAs($this->user)->getJson('/api/products/9999');
 
-    $response->assertStatus(404);
+    $response->assertStatus(404)
+             ->assertJson([
+                 'success' => false,
+                 'message' => 'El recurso solicitado no existe.'
+             ]);
 });
 
 test('cannot add price with invalid currency_id', function () {
