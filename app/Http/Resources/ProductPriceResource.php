@@ -18,7 +18,6 @@ class ProductPriceResource extends JsonResource
             'id' => $this->id,
             'price' => $this->price,
             'currency' => new CurrencyResource($this->whenLoaded('currency')),
-            'created_at' => $this->created_at,
         ];
     }
 }
