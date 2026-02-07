@@ -21,13 +21,15 @@ class StoreProductRequest extends FormRequest
      */
     public function rules(): array
     {
+        $isRequired = $this->isMethod('POST') ? 'required' : 'sometimes';
+
         return [
-            'name' => ['required', 'string', 'max:255'],
+            'name' => [$isRequired, 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'price' => ['required', 'numeric', 'min:0'],
-            'currency_id' => ['required', 'exists:currencies,id'],
-            'tax_cost' => ['required', 'numeric', 'min:0'],
-            'manufacturing_cost' => ['required', 'numeric', 'min:0'],
+            'price' => [$isRequired, 'numeric', 'min:0'],
+            'currency_id' => [$isRequired, 'exists:currencies,id'],
+            'tax_cost' => [$isRequired, 'numeric', 'min:0'],
+            'manufacturing_cost' => [$isRequired, 'numeric', 'min:0'],
         ];
     }
 
