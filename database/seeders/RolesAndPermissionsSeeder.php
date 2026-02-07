@@ -26,6 +26,8 @@ class RolesAndPermissionsSeeder extends Seeder
             'products.destroy',
             'products.prices',
             'products.storePrice',
+            'auth:profile',
+            'auth:logout',
         ];
 
         foreach ($permissions as $permission) {

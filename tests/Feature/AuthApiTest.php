@@ -40,6 +40,7 @@ test('user can login', function () {
     $user = User::factory()->create([
         'password' => Hash::make('password123')
     ]);
+    $user->assignRole('user');
 
     $response = postJson('/api/login', [
         'email' => $user->email,
@@ -51,8 +52,22 @@ test('user can login', function () {
              ->assertJsonStructure(['data' => ['token']]);
 });
 
+test('user can get their profile', function () {
+    $user = User::factory()->create();
+    $user->assignRole('user');
+    $token = $user->createToken('test')->plainTextToken;
+
+    $response = $this->withHeader('Authorization', 'Bearer ' . $token)
+                     ->getJson('/api/profile');
+
+    $response->assertStatus(200)
+             ->assertJsonPath('success', true)
+             ->assertJsonPath('data.email', $user->email);
+});
+
 test('user can logout', function () {
     $user = User::factory()->create();
+    $user->assignRole('user');
     $token = $user->createToken('test')->plainTextToken;
 
     $response = $this->withHeader('Authorization', 'Bearer ' . $token)
