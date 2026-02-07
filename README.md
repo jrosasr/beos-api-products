@@ -42,7 +42,7 @@ Asegúrate de que `DB_CONNECTION` en tu `.env` sea `sqlite`.
 
 Si prefieres usar PostgreSQL, puedes levantar el contenedor incluido:
 
-1.  Asegúrate de que el puerto 5439 esté libre o ajusta `FORWARD_DB_PORT` en el `.env`.
+1.  Asegúrate de que el puerto 5439 esté libre o ajusta `DB_PORT` en el `.env`.
 2.  Ejecuta:
 
 ```bash
